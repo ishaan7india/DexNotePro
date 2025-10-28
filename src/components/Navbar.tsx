@@ -62,10 +62,10 @@ const Navbar = () => {
                   AI Tools
                 </Link>
 
-                {/* 🧠 Added AI Doubt Solver */}
+                {/* 🧠 Added AI Doubt Solver 
                 <Link to="/doubt-solver" className={linkClasses("/doubt-solver")}>
                   Doubt Solver
-                </Link>
+                </Link> */}
 
                 {/* 🧩 Added Whiteboard */}
                 <Link to="/whiteboard" className={linkClasses("/whiteboard")}>
