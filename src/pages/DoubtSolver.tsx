@@ -1,98 +1,140 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, Download, PenTool } from "lucide-react";
 
-const DoubtSolver = () => {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+const Whiteboard = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [strokeColor, setStrokeColor] = useState("#000000");
+  const [lineWidth, setLineWidth] = useState(2);
 
-  const handleSolve = async () => {
-    if (!question.trim()) {
-      setError("Please enter a question.");
-      return;
+  // 🖌️ Setup the canvas when component mounts
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resizeCanvas = () => {
+      const { width, height } = canvas.getBoundingClientRect();
+      const tempImage = ctxRef.current?.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width = width;
+      canvas.height = height;
+      if (tempImage && ctxRef.current) ctxRef.current.putImageData(tempImage, 0, 0);
+    };
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.lineCap = "round";
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = lineWidth;
+      ctxRef.current = ctx;
     }
 
-    setError("");
-    setAnswer("");
-    setLoading(true);
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tools`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: question,
-            action: "doubt_solver", // 👈 Uses your updated backend
-          }),
-        }
-      );
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, []);
 
-      const data = await response.json();
+  // ✏️ Start drawing
+  const startDrawing = (e: React.MouseEvent) => {
+    const { offsetX, offsetY } = e.nativeEvent;
+    ctxRef.current?.beginPath();
+    ctxRef.current?.moveTo(offsetX, offsetY);
+    setIsDrawing(true);
+  };
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to get response");
-      }
+  // 🧭 Draw as mouse moves
+  const draw = (e: React.MouseEvent) => {
+    if (!isDrawing) return;
+    const { offsetX, offsetY } = e.nativeEvent;
+    ctxRef.current?.lineTo(offsetX, offsetY);
+    ctxRef.current?.stroke();
+  };
 
-      setAnswer(data.result);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+  // 🛑 Stop drawing
+  const stopDrawing = () => {
+    ctxRef.current?.closePath();
+    setIsDrawing(false);
+  };
+
+  // 🗑️ Clear the whiteboard
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (canvas && ctxRef.current) {
+      ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          🧠 AI Doubt Solver
-        </h1>
+  // 💾 Download as image
+  const downloadCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = "whiteboard.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
 
-        <div className="space-y-4">
-          <Textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Enter your question or topic here..."
-            className="w-full h-32"
+  // 🎨 Update color or line width dynamically
+  useEffect(() => {
+    if (ctxRef.current) {
+      ctxRef.current.strokeStyle = strokeColor;
+      ctxRef.current.lineWidth = lineWidth;
+    }
+  }, [strokeColor, lineWidth]);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Navbar />
+
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-6 space-y-4">
+        <h1 className="text-3xl font-bold mb-4">🖍️ Interactive Whiteboard</h1>
+
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <PenTool className="w-4 h-4" />
+            <Input
+              type="color"
+              value={strokeColor}
+              onChange={(e) => setStrokeColor(e.target.value)}
+              className="w-10 h-10 p-1"
+            />
+          </div>
+
+          <Input
+            type="range"
+            min="1"
+            max="10"
+            value={lineWidth}
+            onChange={(e) => setLineWidth(Number(e.target.value))}
+            className="w-32"
           />
 
-          <Button
-            onClick={handleSolve}
-            disabled={loading}
-            className="w-full font-medium"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Solving...
-              </>
-            ) : (
-              "Get Answer"
-            )}
+          <Button variant="destructive" onClick={clearCanvas}>
+            <Trash2 className="w-4 h-4 mr-2" /> Clear
           </Button>
 
-          {error && (
-            <p className="text-red-500 text-sm font-medium text-center">
-              {error}
-            </p>
-          )}
+          <Button onClick={downloadCanvas}>
+            <Download className="w-4 h-4 mr-2" /> Download
+          </Button>
+        </div>
 
-          {answer && (
-            <div className="mt-6 p-4 rounded-md border bg-muted">
-              <h2 className="text-lg font-semibold mb-2">Answer:</h2>
-              <p className="whitespace-pre-line">{answer}</p>
-            </div>
-          )}
+        <div className="w-full max-w-5xl border rounded-xl overflow-hidden shadow-md">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-[70vh] bg-white cursor-crosshair"
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default DoubtSolver;
+export default Whiteboard;
