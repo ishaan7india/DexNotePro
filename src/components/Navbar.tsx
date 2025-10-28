@@ -1,22 +1,26 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import logo from "@/assets/dexnote-logo.png";
+import ThemeToggle from "./ThemeToggle"; // 🌙 Light/Dark Toggle
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -27,6 +31,12 @@ const Navbar = () => {
     await supabase.auth.signOut();
     navigate("/");
   };
+
+  // helper to underline active nav link
+  const linkClasses = (path: string) =>
+    `text-sm font-medium transition-colors hover:text-primary ${
+      location.pathname === path ? "underline underline-offset-4" : ""
+    }`;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,21 +50,30 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             {user ? (
               <>
-                <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/dashboard" className={linkClasses("/dashboard")}>
                   Dashboard
                 </Link>
-                <Link to="/notes" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/notes" className={linkClasses("/notes")}>
                   Notes
                 </Link>
-                <Link to="/courses" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/courses" className={linkClasses("/courses")}>
                   Courses
                 </Link>
-                <Link to="/ai-tools" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/ai-tools" className={linkClasses("/ai-tools")}>
                   AI Tools
                 </Link>
-                <Button onClick={handleSignOut} variant="outline" size="sm">
+
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  size="sm"
+                  className="hover:bg-blue-500 hover:text-white"
+                >
                   Sign Out
                 </Button>
+
+                {/* 🌙 Theme Toggle */}
+                <ThemeToggle />
               </>
             ) : (
               <>
@@ -81,35 +100,61 @@ const Navbar = () => {
               <>
                 <Link
                   to="/dashboard"
-                  className="block px-4 py-2 rounded-md hover:bg-accent"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/dashboard"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/notes"
-                  className="block px-4 py-2 rounded-md hover:bg-accent"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/notes"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   Notes
                 </Link>
                 <Link
                   to="/courses"
-                  className="block px-4 py-2 rounded-md hover:bg-accent"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/courses"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   Courses
                 </Link>
                 <Link
                   to="/ai-tools"
-                  className="block px-4 py-2 rounded-md hover:bg-accent"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/ai-tools"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   AI Tools
                 </Link>
-                <Button onClick={handleSignOut} variant="outline" className="w-full">
+
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  className="w-full hover:bg-blue-500 hover:text-white"
+                >
                   Sign Out
                 </Button>
+
+                {/* 🌙 Theme Toggle in mobile menu */}
+                <div className="px-4 mt-2">
+                  <ThemeToggle />
+                </div>
               </>
             ) : (
               <Link to="/auth" onClick={() => setIsOpen(false)}>
