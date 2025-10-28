@@ -13,6 +13,8 @@ import Courses from "./pages/Courses";
 import AITools from "./pages/AITools";
 import DoubtSolver from "./pages/DoubtSolver";
 import NotFound from "./pages/NotFound";
+import WhiteboardPage from "./pages/WhiteboardPage"; // 🧑‍🏫 new whiteboard page
+import BlogPage from "./pages/BlogPage"; // 📰 placeholder for upcoming blog system
 import LoadingScreen from "./components/LoadingScreen"; // 🌀 Animated loading screen
 import { ThemeProvider } from "@/components/ThemeContext"; // 🌙 Theme provider
 
@@ -21,7 +23,7 @@ const queryClient = new QueryClient();
 const App = () => {
   const [loading, setLoading] = useState(true);
 
-  // ⏳ Simulated initial loading screen
+  // ⏳ Initial loading screen for smoother transitions
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
@@ -46,7 +48,8 @@ const App = () => {
               <Route path="/courses" element={<Courses />} />
               <Route path="/ai-tools" element={<AITools />} />
               <Route path="/doubt-solver" element={<DoubtSolver />} />
-              {/* 🧠 Add new custom routes above the NotFound route */}
+              <Route path="/whiteboard" element={<WhiteboardPage />} /> {/* ✅ Fixed whiteboard route */}
+              <Route path="/blog" element={<BlogPage />} /> {/* 📰 Blog system placeholder */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
