@@ -22,22 +22,22 @@ const AppRoutes = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Show loading on first load
+  // Initial app load
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
+    const timer = setTimeout(() => setIsLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
 
-  // Show loader briefly when navigating
+  // Route transitions
   useEffect(() => {
     setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 600);
+    const timer = setTimeout(() => setIsLoading(false), 700);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  if (isLoading) return <LoadingScreen />;
-
-  return (
+  return isLoading ? (
+    <LoadingScreen />
+  ) : (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
