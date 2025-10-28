@@ -22,21 +22,30 @@ serve(async (req) => {
       throw new Error("Text and action are required");
     }
 
+    // 🧩 SYSTEM PROMPT SELECTION
     let systemPrompt = "";
     switch (action) {
       case "summarize":
-        systemPrompt = "You are a helpful AI assistant that creates concise, clear summaries of text. Extract the key points and present them in an easy-to-understand format.";
+        systemPrompt =
+          "You are a helpful AI assistant that creates concise, clear summaries of text. Extract key points and present them in an easy-to-understand format.";
         break;
       case "flashcards":
-        systemPrompt = "You are a helpful AI assistant that creates study flashcards. Generate 5-10 flashcard pairs (Question/Answer format) based on the provided text. Format them clearly with 'Q:' and 'A:' prefixes.";
+        systemPrompt =
+          "You are a helpful AI assistant that creates study flashcards. Generate 5-10 flashcard pairs (Question/Answer format) based on the provided text. Format them clearly with 'Q:' and 'A:' prefixes.";
         break;
       case "quiz":
-        systemPrompt = "You are a helpful AI assistant that creates quiz questions. Generate 5-10 multiple choice or short answer questions based on the provided text to test comprehension. Include answer keys.";
+        systemPrompt =
+          "You are a helpful AI assistant that creates quiz questions. Generate 5-10 multiple choice or short answer questions based on the provided text to test comprehension. Include answer keys.";
+        break;
+      case "doubt_solver":
+        systemPrompt =
+          "You are an educational AI tutor that explains concepts and solves student doubts. When given a question or topic, provide a clear, step-by-step explanation, examples where helpful, and avoid unnecessary jargon. If the question is unclear, politely ask for clarification.";
         break;
       default:
         throw new Error("Invalid action");
     }
 
+    // 🧠 CALL LOVABLE AI GATEWAY
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
