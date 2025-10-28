@@ -1,0 +1,86 @@
+.loading-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--background, #ffffff);
+  z-index: 9999;
+  animation: fadeOut 0.8s ease-out 1.3s forwards;
+}
+
+.spinner {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  animation: scaleIn 0.6s ease-out;
+}
+
+/* 💙💛 Blue-gold circle spinner */
+.spinner::before {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border: 5px solid #2563eb; /* DexNote Blue */
+  border-top-color: #fbbf24; /* Gold accent */
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+
+.loading-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.loading-text {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+  text-align: center;
+  opacity: 0;
+  animation: textFade 1s ease-in 0.3s forwards;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes textFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
