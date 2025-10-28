@@ -2,8 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, FileText, Sparkles, TrendingUp } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BookOpen, FileText, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,7 +22,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         navigate("/auth");
         return;
@@ -62,10 +70,13 @@ const Dashboard = () => {
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Welcome Back!
           </h1>
-          <p className="text-muted-foreground">Here's your learning progress overview</p>
+          <p className="text-muted-foreground">
+            Here's your learning progress overview
+          </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        {/* ✅ Removed AI Tools card, simplified Courses Completed display */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Notes</CardTitle>
@@ -73,31 +84,26 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.notesCount}</div>
-              <p className="text-xs text-muted-foreground">Your personal knowledge base</p>
+              <p className="text-xs text-muted-foreground">
+                Your personal knowledge base
+              </p>
             </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Courses Completed</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Courses Completed
+              </CardTitle>
               <BookOpen className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats.coursesCompleted}/{stats.totalCourses}
+                {stats.coursesCompleted}
               </div>
-              <p className="text-xs text-muted-foreground">Keep up the great work!</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">AI Tools Used</CardTitle>
-              <Sparkles className="h-4 w-4 text-accent" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">-</div>
-              <p className="text-xs text-muted-foreground">Enhance your learning</p>
+              <p className="text-xs text-muted-foreground">
+                Keep up the great work!
+              </p>
             </CardContent>
           </Card>
 
@@ -108,15 +114,21 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats.totalCourses > 0 
-                  ? Math.round((stats.coursesCompleted / stats.totalCourses) * 100)
-                  : 0}%
+                {stats.totalCourses > 0
+                  ? Math.round(
+                      (stats.coursesCompleted / stats.totalCourses) * 100
+                    )
+                  : 0}
+                %
               </div>
-              <p className="text-xs text-muted-foreground">Course completion rate</p>
+              <p className="text-xs text-muted-foreground">
+                Course completion rate
+              </p>
             </CardContent>
           </Card>
         </div>
 
+        {/* 📖 Activity & Actions */}
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -125,7 +137,8 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Start creating notes or completing courses to see your activity here.
+                Start creating notes or completing courses to see your activity
+                here.
               </p>
             </CardContent>
           </Card>
