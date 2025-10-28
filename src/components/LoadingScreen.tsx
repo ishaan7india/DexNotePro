@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "@/assets/short-logo.png";
-import "./LoadingScreen.css";
+import "./LoadingScreen.css"; // 👈 make sure this CSS file exists
 
 const LoadingScreen = () => {
   return (
