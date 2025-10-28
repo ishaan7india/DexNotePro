@@ -32,7 +32,6 @@ const Navbar = () => {
     navigate("/");
   };
 
-  // helper to underline active nav link
   const linkClasses = (path: string) =>
     `text-sm font-medium transition-colors hover:text-primary ${
       location.pathname === path ? "underline underline-offset-4" : ""
@@ -68,6 +67,14 @@ const Navbar = () => {
                   Whiteboard
                 </Link>
 
+                {/* 🧠 Added AI Doubt Solver */}
+                <Link
+                  to="/ai-doubt-solver"
+                  className={linkClasses("/ai-doubt-solver")}
+                >
+                  Doubt Solver
+                </Link>
+
                 <Button
                   onClick={handleSignOut}
                   variant="outline"
@@ -77,7 +84,6 @@ const Navbar = () => {
                   Sign Out
                 </Button>
 
-                {/* 🌙 Theme Toggle */}
                 <ThemeToggle />
               </>
             ) : (
@@ -159,6 +165,19 @@ const Navbar = () => {
                   Whiteboard
                 </Link>
 
+                {/* 🧠 Added AI Doubt Solver link for mobile */}
+                <Link
+                  to="/ai-doubt-solver"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/ai-doubt-solver"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Doubt Solver
+                </Link>
+
                 <Button
                   onClick={handleSignOut}
                   variant="outline"
@@ -167,7 +186,6 @@ const Navbar = () => {
                   Sign Out
                 </Button>
 
-                {/* 🌙 Theme Toggle in mobile menu */}
                 <div className="px-4 mt-2">
                   <ThemeToggle />
                 </div>
