@@ -46,7 +46,7 @@ const App = () => {
               <Route path="/notes" element={<Notes />} />
               <Route path="/courses" element={<Courses />} />
               <Route path="/ai-tools" element={<AITools />} />
-              <Route path="/doubt-solver" element={<DoubtSolver />} />
+              {/* <Route path="/doubt-solver" element={<DoubtSolver />} /> */}
               <Route path="/whiteboard" element={<Whiteboard />} /> {/* 🎨 Added new route */}
               <Route path="*" element={<NotFound />} /> {/* ⛔ Keep this last */}
             </Routes>
