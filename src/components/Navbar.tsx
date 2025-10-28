@@ -63,6 +63,11 @@ const Navbar = () => {
                   AI Tools
                 </Link>
 
+                {/* 🧩 Added Whiteboard */}
+                <Link to="/whiteboard" className={linkClasses("/whiteboard")}>
+                  Whiteboard
+                </Link>
+
                 <Button
                   onClick={handleSignOut}
                   variant="outline"
@@ -76,11 +81,9 @@ const Navbar = () => {
                 <ThemeToggle />
               </>
             ) : (
-              <>
-                <Link to="/auth">
-                  <Button>Get Started</Button>
-                </Link>
-              </>
+              <Link to="/auth">
+                <Button>Get Started</Button>
+              </Link>
             )}
           </div>
 
@@ -141,6 +144,19 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   AI Tools
+                </Link>
+
+                {/* 🧩 Added Whiteboard link for mobile */}
+                <Link
+                  to="/whiteboard"
+                  className={`block px-4 py-2 rounded-md hover:bg-accent ${
+                    location.pathname === "/whiteboard"
+                      ? "underline underline-offset-4"
+                      : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Whiteboard
                 </Link>
 
                 <Button
