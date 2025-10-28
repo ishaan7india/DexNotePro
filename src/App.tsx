@@ -10,9 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Notes from "./pages/Notes";
 import Courses from "./pages/Courses";
 import AITools from "./pages/AITools";
+import DoubtSolver from "./pages/DoubtSolver"; // 🧠 New import
 import NotFound from "./pages/NotFound";
-import CalculatorPage from "./pages/CalculatorPage"; // ✅ Added in Step 5
-import WhiteboardPage from "./pages/WhiteboardPage"; // ✅ Added in Step 6
 
 const queryClient = new QueryClient();
 
@@ -29,12 +28,8 @@ const App = () => (
           <Route path="/notes" element={<Notes />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/ai-tools" element={<AITools />} />
-
-          {/* ✅ New utility pages */}
-          <Route path="/calculator" element={<CalculatorPage />} />
-          <Route path="/whiteboard" element={<WhiteboardPage />} />
-
-          {/* Always keep NotFound last */}
+          <Route path="/doubt-solver" element={<DoubtSolver />} /> {/* 🧠 New Route */}
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
