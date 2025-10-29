@@ -13,7 +13,16 @@ import { FileText } from "lucide-react";
 const Dashboard = () => {
   const [noteCount, setNoteCount] = useState(0);
   const [userName, setUserName] = useState("");
-  const [quote, setQuote] = useState("");
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [fadeIn, setFadeIn] = useState(false);
+
+  const quotes = [
+    "“Learning never exhausts the mind.” — Leonardo da Vinci",
+    "“The beautiful thing about learning is that no one can take it away from you.” — B.B. King",
+    "“Strive for progress, not perfection.”",
+    "“An investment in knowledge pays the best interest.” — Benjamin Franklin",
+    "“Small steps every day lead to big results.”",
+  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -33,55 +42,57 @@ const Dashboard = () => {
         if (count !== null) setNoteCount(count);
       }
     };
-    fetchUserData();
 
-    // ✨ Random motivational quote
-    const quotes = [
-      "“Learning never exhausts the mind.” — Leonardo da Vinci",
-      "“The beautiful thing about learning is that no one can take it away from you.” — B.B. King",
-      "“Strive for progress, not perfection.”",
-      "“An investment in knowledge pays the best interest.” — Benjamin Franklin",
-      "“Small steps every day lead to big results.”",
-    ];
-    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+    fetchUserData();
+    setFadeIn(true);
+
+    const interval = setInterval(() => {
+      setFadeIn(false);
+      setTimeout(() => {
+        setQuoteIndex((prev) => (prev + 1) % quotes.length);
+        setFadeIn(true);
+      }, 500);
+    }, 6000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen flex flex-col transition-colors duration-500 bg-gradient-to-b from-background to-muted text-foreground">
       <Navbar />
-      <main className="container mx-auto px-6 py-16 text-center">
-        {/* Greeting */}
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+      <main className="flex flex-1 flex-col items-center justify-center text-center px-6 py-10">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-3 bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent dark:from-primary dark:to-accent">
           Welcome back{userName ? `, ${userName}!` : "!"}
         </h1>
+
         <p className="text-lg md:text-xl text-muted-foreground mb-6">
           Ready to continue your learning journey?
         </p>
 
-        {/* Quote */}
-        <blockquote className="italic text-muted-foreground/80 text-md md:text-lg mb-12">
-          {quote}
+        <blockquote
+          className={`italic text-muted-foreground/80 text-md md:text-lg mb-12 max-w-xl transition-opacity duration-700 ${
+            fadeIn ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {quotes[quoteIndex]}
         </blockquote>
 
-        {/* Centered Cards Section */}
-        <div className="flex justify-center">
-          <Card className="max-w-xs w-full bg-card border border-border shadow-md hover:shadow-lg transition">
-            <CardHeader className="text-center">
-              <CardTitle className="flex flex-col items-center text-primary text-xl font-semibold">
-                <FileText className="h-6 w-6 mb-1 text-primary" />
-                Total Notes
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Your personal knowledge base
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-5xl font-extrabold mt-2 text-primary">
-                {noteCount}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="w-full max-w-md bg-card/80 dark:bg-card border border-border/50 shadow-md dark:shadow-primary/10 hover:shadow-lg hover:shadow-accent/10 transition-all duration-300">
+          <CardHeader className="text-center">
+            <CardTitle className="flex justify-center items-center gap-2 text-xl font-semibold text-blue-500 dark:text-primary">
+              <FileText className="h-6 w-6 text-blue-500 dark:text-primary" />
+              Total Notes
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Your personal knowledge base
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center items-center">
+            <p className="text-5xl font-extrabold text-blue-500 dark:text-primary mt-2">
+              {noteCount}
+            </p>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
