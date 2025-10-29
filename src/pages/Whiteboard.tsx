@@ -1,79 +1,67 @@
 import React, { useRef, useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Trash2, Eraser, FileDown } from "lucide-react";
 
-const Whiteboard = () => {
-  const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
+const Whiteboard: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
-  const [lineWidth, setLineWidth] = useState(2);
-  const [isEraser, setIsEraser] = useState(false);
+  const [lineWidth, setLineWidth] = useState(3);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctxRef.current = ctx;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.7;
+
+    context.lineCap = "round";
+    context.strokeStyle = color;
+    context.lineWidth = lineWidth;
+    contextRef.current = context;
   }, [color, lineWidth]);
 
-  const startDrawing = (e) => {
-    if (!ctxRef.current) return;
-    ctxRef.current.beginPath();
-    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+  const startDrawing = (e: React.MouseEvent) => {
+    contextRef.current?.beginPath();
+    contextRef.current?.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     setIsDrawing(true);
   };
 
-  const draw = (e) => {
-    if (!isDrawing || !ctxRef.current) return;
-    ctxRef.current.strokeStyle = isEraser ? "#FFFFFF" : color;
-    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    ctxRef.current.stroke();
+  const draw = (e: React.MouseEvent) => {
+    if (!isDrawing) return;
+    contextRef.current?.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    contextRef.current?.stroke();
   };
 
   const stopDrawing = () => {
-    if (!ctxRef.current) return;
-    ctxRef.current.closePath();
+    contextRef.current?.closePath();
     setIsDrawing(false);
   };
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    if (canvas && ctxRef.current) {
-      ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
+    const context = contextRef.current;
+    if (canvas && context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
     }
   };
 
-  const exportToPDF = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const imgData = canvas.toDataURL("image/png");
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("l", "pt", [canvas.width, canvas.height]);
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-    pdf.save("whiteboard.pdf");
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <div className="container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-4 text-center">🖊️ Whiteboard</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 p-6">
+      <div className="bg-white shadow-lg rounded-2xl p-4 md:p-6 w-full max-w-5xl border border-gray-200 flex flex-col items-center">
+        <h1 className="text-3xl font-bold text-gray-700 mb-6 text-center">
+          ✏️ DexNote Whiteboard
+        </h1>
 
-        <div className="flex flex-wrap justify-center items-center gap-3 mb-4">
+        {/* Toolbar */}
+        <div className="flex flex-wrap justify-center items-center gap-4 mb-6">
           <input
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="w-10 h-10 p-1 rounded border"
-            disabled={isEraser}
+            className="w-10 h-10 border-none rounded-full cursor-pointer"
           />
           <input
             type="range"
@@ -81,35 +69,25 @@ const Whiteboard = () => {
             max="10"
             value={lineWidth}
             onChange={(e) => setLineWidth(Number(e.target.value))}
+            className="w-32 accent-blue-500"
           />
-
-          <Button
-            onClick={() => setIsEraser(!isEraser)}
-            variant={isEraser ? "secondary" : "outline"}
+          <button
+            onClick={clearCanvas}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
           >
-            <Eraser className="mr-2 h-4 w-4" />
-            {isEraser ? "Eraser On" : "Eraser Off"}
-          </Button>
-
-          <Button onClick={clearCanvas} variant="destructive">
-            <Trash2 className="mr-2 h-4 w-4" /> Clear
-          </Button>
-
-          <Button onClick={exportToPDF} variant="default">
-            <FileDown className="mr-2 h-4 w-4" /> Export PDF
-          </Button>
+            Clear
+          </button>
         </div>
 
-        <div className="flex justify-center">
+        {/* Canvas */}
+        <div className="flex justify-center items-center">
           <canvas
             ref={canvasRef}
-            width={800}
-            height={500}
-            className="border rounded-lg bg-white shadow-lg cursor-crosshair"
             onMouseDown={startDrawing}
-            onMouseMove={draw}
             onMouseUp={stopDrawing}
+            onMouseMove={draw}
             onMouseLeave={stopDrawing}
+            className="border border-gray-300 rounded-lg bg-white shadow-md cursor-crosshair"
           />
         </div>
       </div>
