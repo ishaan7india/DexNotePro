@@ -24,35 +24,22 @@ const Whiteboard = () => {
 
   const startDrawing = (e: React.MouseEvent) => {
     if (!ctxRef.current) return;
-    const coords = getCanvasCoordinates(e);
     ctxRef.current.beginPath();
-    ctxRef.current.moveTo(coords.x, coords.y);
+    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     setIsDrawing(true);
   };
 
   const draw = (e: React.MouseEvent) => {
     if (!isDrawing || !ctxRef.current) return;
-    const coords = getCanvasCoordinates(e);
-    ctxRef.current.lineTo(coords.x, coords.y);
+    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     ctxRef.current.stroke();
   };
 
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
 
-  const getCanvasCoordinates = (e: React.MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  };
-
   const handleMouseMove = (e: React.MouseEvent) => {
-    const coords = getCanvasCoordinates(e);
-    setCursorPos(coords);
+    setCursorPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
     draw(e);
   };
 
@@ -120,39 +107,17 @@ const Whiteboard = () => {
             <Trash2 className="mr-2 h-4 w-4" /> Clear
           </Button>
         </div>
-        <div className="flex justify-center relative">
+        <div className="flex justify-center">
           <canvas
             ref={canvasRef}
             width={800}
             height={500}
-            className="border rounded-lg bg-white shadow-lg cursor-none"
+            className="border rounded-lg bg-white shadow-lg cursor-crosshair"
             onMouseDown={startDrawing}
-            onMouseMove={handleMouseMove}
+            onMouseMove={draw}
             onMouseUp={stopDrawing}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeaveCanvas}
+            onMouseLeave={stopDrawing}
           />
-          {showCursor && (
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                left: cursorPos.x,
-                top: cursorPos.y,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <div
-                className={`rounded-full border-2 ${
-                  isEraser ? 'border-gray-400' : 'border-black'
-                }`}
-                style={{
-                  width: `${isEraser ? lineWidth * 3 : lineWidth}px`,
-                  height: `${isEraser ? lineWidth * 3 : lineWidth}px`,
-                  backgroundColor: isEraser ? 'rgba(255, 255, 255, 0.5)' : 'transparent',
-                }}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
