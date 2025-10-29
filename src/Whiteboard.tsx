@@ -1,67 +1,83 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Trash2, Eraser, FileDown } from "lucide-react";
+import jsPDF from "jspdf";
 
-const WhiteboardPage = () => {
+const Whiteboard = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
   const [lineWidth, setLineWidth] = useState(2);
+  const [isEraser, setIsEraser] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.width = window.innerWidth * 0.8;
-      canvas.height = window.innerHeight * 0.7;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.lineCap = "round";
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
-        ctxRef.current = ctx;
-      }
-    }
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctxRef.current = ctx;
   }, [color, lineWidth]);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
-    ctx.beginPath();
-    ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+  const startDrawing = (e: React.MouseEvent) => {
+    if (!ctxRef.current) return;
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     setIsDrawing(true);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent) => {
+    if (!isDrawing || !ctxRef.current) return;
     const ctx = ctxRef.current;
-    if (!ctx || !isDrawing) return;
+    ctx.strokeStyle = isEraser ? "#ffffff" : color;
     ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     ctx.stroke();
   };
 
   const stopDrawing = () => {
-    const ctx = ctxRef.current;
-    if (ctx) ctx.closePath();
+    if (!ctxRef.current) return;
+    ctxRef.current.closePath();
     setIsDrawing(false);
   };
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const ctx = ctxRef.current;
-    if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (canvas && ctxRef.current) {
+      ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  const exportToPDF = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+    const imgData = canvas.toDataURL("image/png");
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    pdf.save("whiteboard.pdf");
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <div className="flex flex-col items-center py-8 space-y-4">
-        <h1 className="text-3xl font-bold mb-4">Whiteboard</h1>
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold mb-4 text-center">🖊️ Whiteboard</h1>
 
-        <div className="flex space-x-4 mb-4">
+        <div className="flex justify-center items-center gap-4 mb-4 flex-wrap">
           <input
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="w-10 h-10 cursor-pointer"
+            className="w-10 h-10 p-1 rounded border"
           />
           <input
             type="range"
@@ -70,25 +86,35 @@ const WhiteboardPage = () => {
             value={lineWidth}
             onChange={(e) => setLineWidth(Number(e.target.value))}
           />
-          <button
-            onClick={clearCanvas}
-            className="px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90"
+          <Button
+            variant={isEraser ? "secondary" : "default"}
+            onClick={() => setIsEraser(!isEraser)}
           >
-            Clear
-          </button>
+            <Eraser className="mr-2 h-4 w-4" /> {isEraser ? "Disable Eraser" : "Eraser"}
+          </Button>
+          <Button onClick={exportToPDF} variant="outline">
+            <FileDown className="mr-2 h-4 w-4" /> Export PDF
+          </Button>
+          <Button onClick={clearCanvas} variant="destructive">
+            <Trash2 className="mr-2 h-4 w-4" /> Clear
+          </Button>
         </div>
 
-        <canvas
-          ref={canvasRef}
-          onMouseDown={startDrawing}
-          onMouseUp={stopDrawing}
-          onMouseMove={draw}
-          onMouseLeave={stopDrawing}
-          className="border border-border bg-white dark:bg-gray-800 rounded-lg shadow-md"
-        />
+        <div className="flex justify-center">
+          <canvas
+            ref={canvasRef}
+            width={800}
+            height={500}
+            className="border rounded-lg bg-white shadow-lg cursor-crosshair"
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-export default WhiteboardPage;
+export default Whiteboard;
