@@ -1,67 +1,69 @@
 import React, { useRef, useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Trash2, Pencil, Eraser } from "lucide-react";
 
-const Whiteboard: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+const Whiteboard = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
-  const [lineWidth, setLineWidth] = useState(3);
+  const [lineWidth, setLineWidth] = useState(2);
+  const [isEraser, setIsEraser] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    canvas.width = window.innerWidth * 0.8;
-    canvas.height = window.innerHeight * 0.7;
-
-    context.lineCap = "round";
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
-    contextRef.current = context;
-  }, [color, lineWidth]);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = isEraser ? "#FFFFFF" : color;
+    ctx.lineWidth = isEraser ? lineWidth * 3 : lineWidth;
+    ctxRef.current = ctx;
+  }, [color, lineWidth, isEraser]);
 
   const startDrawing = (e: React.MouseEvent) => {
-    contextRef.current?.beginPath();
-    contextRef.current?.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    if (!ctxRef.current) return;
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     setIsDrawing(true);
   };
 
   const draw = (e: React.MouseEvent) => {
-    if (!isDrawing) return;
-    contextRef.current?.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    contextRef.current?.stroke();
+    if (!isDrawing || !ctxRef.current) return;
+    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    ctxRef.current.stroke();
   };
 
   const stopDrawing = () => {
-    contextRef.current?.closePath();
+    if (!ctxRef.current) return;
+    ctxRef.current.closePath();
     setIsDrawing(false);
   };
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const context = contextRef.current;
-    if (canvas && context) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+    if (canvas && ctxRef.current) {
+      ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 p-6">
-      <div className="bg-white shadow-lg rounded-2xl p-4 md:p-6 w-full max-w-5xl border border-gray-200 flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-gray-700 mb-6 text-center">
-          ✏️ DexNote Whiteboard
-        </h1>
+  const toggleEraser = () => {
+    setIsEraser(!isEraser);
+  };
 
-        {/* Toolbar */}
-        <div className="flex flex-wrap justify-center items-center gap-4 mb-6">
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-3xl font-bold mb-4 text-center">🖊️ Whiteboard</h1>
+        <div className="flex justify-center items-center gap-4 mb-4">
           <input
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="w-10 h-10 border-none rounded-full cursor-pointer"
+            className="w-10 h-10 p-1 rounded border"
+            disabled={isEraser}
           />
           <input
             type="range"
@@ -69,25 +71,35 @@ const Whiteboard: React.FC = () => {
             max="10"
             value={lineWidth}
             onChange={(e) => setLineWidth(Number(e.target.value))}
-            className="w-32 accent-blue-500"
           />
-          <button
-            onClick={clearCanvas}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+          <Button 
+            onClick={toggleEraser}
+            variant={isEraser ? "default" : "outline"}
           >
-            Clear
-          </button>
+            {isEraser ? (
+              <>
+                <Pencil className="mr-2 h-4 w-4" /> Pen
+              </>
+            ) : (
+              <>
+                <Eraser className="mr-2 h-4 w-4" /> Eraser
+              </>
+            )}
+          </Button>
+          <Button onClick={clearCanvas} variant="destructive">
+            <Trash2 className="mr-2 h-4 w-4" /> Clear
+          </Button>
         </div>
-
-        {/* Canvas */}
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center">
           <canvas
             ref={canvasRef}
+            width={800}
+            height={500}
+            className="border rounded-lg bg-white shadow-lg cursor-crosshair"
             onMouseDown={startDrawing}
-            onMouseUp={stopDrawing}
             onMouseMove={draw}
+            onMouseUp={stopDrawing}
             onMouseLeave={stopDrawing}
-            className="border border-gray-300 rounded-lg bg-white shadow-md cursor-crosshair"
           />
         </div>
       </div>
