@@ -1,131 +1,76 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, FileText } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { FileText } from "lucide-react";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    notesCount: 0,
-    coursesCompleted: 0,
-    totalCourses: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [noteCount, setNoteCount] = useState(0);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const fetchNoteCount = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-
-      // Fetch user statistics
-      const [notesResult, progressResult, coursesResult] = await Promise.all([
-        supabase.from("notes").select("*", { count: "exact", head: true }),
-        supabase
-          .from("user_course_progress")
-          .select("*", { count: "exact", head: true })
-          .eq("completed", true),
-        supabase.from("courses").select("*", { count: "exact", head: true }),
-      ]);
-
-      setStats({
-        notesCount: notesResult.count || 0,
-        coursesCompleted: progressResult.count || 0,
-        totalCourses: coursesResult.count || 0,
-      });
-      setLoading(false);
+      if (!session) return;
+      const { count } = await supabase
+        .from("notes")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", session.user.id);
+      if (count !== null) setNoteCount(count);
     };
-
-    checkAuth();
-  }, [navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    );
-  }
+    fetchNoteCount();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Welcome Back!
-          </h1>
-          <p className="text-muted-foreground">Here's your learning progress overview</p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Notes</CardTitle>
-              <FileText className="h-4 w-4 text-accent" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.notesCount}</div>
-              <p className="text-xs text-muted-foreground">Your personal knowledge base</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Courses Completed</CardTitle>
-              <BookOpen className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.coursesCompleted}</div>
-              <p className="text-xs text-muted-foreground">Keep up the great work!</p>
-            </CardContent>
-          </Card>
-        </div>
+      <main className="container mx-auto px-4 py-10">
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          Welcome Back!
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          Here's your learning progress overview
+        </p>
 
         <div className="grid gap-6 md:grid-cols-2">
+          {/* Total Notes */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your latest learning activities</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Total Notes
+              </CardTitle>
+              <CardDescription>Your personal knowledge base</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Start creating notes or completing courses to see your activity here.
-              </p>
+              <p className="text-3xl font-semibold">{noteCount}</p>
             </CardContent>
           </Card>
 
+          {/* Quick Actions */}
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
               <CardDescription>Jump right into learning</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <button
-                onClick={() => navigate("/notes")}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+              <a
+                href="/notes"
+                className="block text-primary hover:underline"
               >
-                📝 Create a new note
-              </button>
-              <button
-                onClick={() => navigate("/courses")}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+                ✏️ Create a new note
+              </a>
+              <a
+                href="/courses"
+                className="block text-primary hover:underline"
               >
-                📚 Browse courses
-              </button>
-              <button
-                onClick={() => navigate("/ai-tools")}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+                📘 Browse courses
+              </a>
+              <a
+                href="/aitools"
+                className="block text-primary hover:underline"
               >
-                ✨ Try AI tools
-              </button>
+                🤖 Try AI tools
+              </a>
             </CardContent>
           </Card>
         </div>
