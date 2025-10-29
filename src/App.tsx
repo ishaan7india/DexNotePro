@@ -12,19 +12,26 @@ import Notes from "./pages/Notes";
 import Courses from "./pages/Courses";
 import AITools from "./pages/AITools";
 import DoubtSolver from "./pages/DoubtSolver";
-import Whiteboard from "./pages/Whiteboard"; // 🎨 Added Whiteboard page
+import Whiteboard from "./pages/Whiteboard";
 import NotFound from "./pages/NotFound";
-import LoadingScreen from "./components/LoadingScreen"; // 🌀 Animated loading screen
-import { ThemeProvider } from "@/components/ThemeContext"; // 🌙 Theme provider
+import LoadingScreen from "./components/LoadingScreen";
+import { ThemeProvider } from "@/components/ThemeContext";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [loading, setLoading] = useState(true);
 
-  // ⏳ Simulated initial loading screen
   useEffect(() => {
+    // ⏳ Simulated initial loading screen
     const timer = setTimeout(() => setLoading(false), 1500);
+
+    // ✅ Fix disappearing favicon issue after React mounts
+    const favicon = document.getElementById("favicon") as HTMLLinkElement | null;
+    if (favicon) {
+      favicon.href = "/DexNotePro/short-logo.png";
+    }
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -47,8 +54,8 @@ const App = () => {
               <Route path="/courses" element={<Courses />} />
               <Route path="/ai-tools" element={<AITools />} />
               {/* <Route path="/doubt-solver" element={<DoubtSolver />} /> */}
-              <Route path="/whiteboard" element={<Whiteboard />} /> {/* 🎨 Added new route */}
-              <Route path="*" element={<NotFound />} /> {/* ⛔ Keep this last */}
+              <Route path="/whiteboard" element={<Whiteboard />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>
