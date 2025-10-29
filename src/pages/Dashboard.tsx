@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
 const Dashboard = () => {
@@ -11,9 +17,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) {
-        const name = session.user.user_metadata?.name || session.user.email?.split("@")[0];
+        const name =
+          session.user.user_metadata?.name ||
+          session.user.email?.split("@")[0];
         setUserName(name || "Learner");
 
         const { count } = await supabase
@@ -31,42 +41,42 @@ const Dashboard = () => {
       "“The beautiful thing about learning is that no one can take it away from you.” — B.B. King",
       "“Strive for progress, not perfection.”",
       "“An investment in knowledge pays the best interest.” — Benjamin Franklin",
-      "“Small steps every day lead to big results.”"
+      "“Small steps every day lead to big results.”",
     ];
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
       <main className="container mx-auto px-6 py-16 text-center">
         {/* Greeting */}
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-3 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           Welcome back{userName ? `, ${userName}!` : "!"}
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 mb-8">
+        <p className="text-lg md:text-xl text-muted-foreground mb-6">
           Ready to continue your learning journey?
         </p>
 
         {/* Quote */}
-        <blockquote className="italic text-gray-400 text-md md:text-lg mb-12">
+        <blockquote className="italic text-muted-foreground/80 text-md md:text-lg mb-12">
           {quote}
         </blockquote>
 
-        {/* Cards Section */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 justify-center items-center">
-          <Card className="bg-slate-800/60 border border-slate-700 backdrop-blur-sm shadow-lg hover:shadow-blue-500/10 transition">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl font-semibold text-blue-400">
-                <FileText className="h-6 w-6 text-blue-400" />
+        {/* Centered Cards Section */}
+        <div className="flex justify-center">
+          <Card className="max-w-xs w-full bg-card border border-border shadow-md hover:shadow-lg transition">
+            <CardHeader className="text-center">
+              <CardTitle className="flex flex-col items-center text-primary text-xl font-semibold">
+                <FileText className="h-6 w-6 mb-1 text-primary" />
                 Total Notes
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-muted-foreground">
                 Your personal knowledge base
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-5xl font-extrabold text-blue-300 mt-2">
+            <CardContent className="text-center">
+              <p className="text-5xl font-extrabold mt-2 text-primary">
                 {noteCount}
               </p>
             </CardContent>
