@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DexNote Pro</title>
 
-    <!-- ✅ Works with GitHub Pages -->
-    <link rel="icon" type="image/png" href="/DexNotePro/short-logo.png" />
+    <!-- ✅ Corrected path for GitHub Pages subdirectory -->
+    <link rel="icon" type="image/png" href="./short-logo.png" />
 
     <meta
       name="description"
@@ -47,7 +47,7 @@
   <body>
     <div id="root"></div>
 
-    <!-- ✅ Use relative path for Vite (works locally + GitHub Pages) -->
+    <!-- ✅ Keep relative path (not absolute) for GitHub Pages -->
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
