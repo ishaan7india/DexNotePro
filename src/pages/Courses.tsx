@@ -26,98 +26,91 @@ const Courses = () => {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Base URL for GitHub Pages
-  const baseURL = "https://ishaan7india.github.io/DexNotePro/courses/";
-
+  // ——— Your Google Drive links (converted to direct view links) ———
   const courses: Course[] = [
-    // 🧮 Mathematics Series
-    {
-      id: "math_middle",
-      title: "Middle School Mathematics (Grades 6–8)",
-      description: "Fundamental math concepts for middle schoolers.",
-      category: "Mathematics",
-      pdf_url: `${baseURL}Middle_School_Mathematics.pdf`,
-    },
-    {
-      id: "math_high",
-      title: "High School Mathematics (Grades 9–10)",
-      description: "Advanced topics in algebra, geometry, and trigonometry.",
-      category: "Mathematics",
-      pdf_url: `${baseURL}High_School_Mathematics.pdf`,
-    },
-    {
-      id: "math_senior",
-      title: "Senior Secondary Mathematics (Grades 11–12)",
-      description: "Comprehensive coverage for senior-level math.",
-      category: "Mathematics",
-      pdf_url: `${baseURL}Senior_Secondary_Mathematics.pdf`,
-    },
-
-    // 💻 Technology
-    {
-      id: "python",
-      title: "Python Foundations",
-      description: "A beginner-friendly guide to Python programming.",
-      category: "Technology",
-      pdf_url: `${baseURL}Python_Foundations.pdf`,
-    },
-    {
-      id: "html",
-      title: "HTML Foundations",
-      description: "Learn how to structure and design web pages using HTML.",
-      category: "Technology",
-      pdf_url: `${baseURL}HTML_Foundations.pdf`,
-    },
-    {
-      id: "backend",
-      title: "Backend Development Foundations",
-      description: "Introduction to servers, databases, and backend frameworks.",
-      category: "Technology",
-      pdf_url: `${baseURL}Backend_Development_Foundations.pdf`,
-    },
     {
       id: "ai_fundamentals",
       title: "AI Fundamentals",
       description: "Understand the core ideas behind Artificial Intelligence.",
       category: "Technology",
-      pdf_url: `${baseURL}AI_Fundamentals.pdf`,
+      pdf_url: "https://drive.google.com/uc?export=view&id=1hJvCyp19laJyCN3dosN8HmP_MJVyEwp6",
     },
     {
       id: "ai_accelerator",
       title: "AI Generalist Accelerator",
       description: "Boost your AI knowledge and skills rapidly.",
       category: "Technology",
-      pdf_url: `${baseURL}AI_Generalist_Accelerator.pdf`,
+      pdf_url: "https://drive.google.com/uc?export=view&id=1iACV5zdxfEDbQKH57D9CiSqAttI8b4Pt",
     },
     {
-      id: "github_intro",
-      title: "Introduction to GitHub",
-      description: "Version control and collaboration essentials using GitHub.",
+      id: "backend",
+      title: "Backend Development Foundations",
+      description: "Introduction to servers, databases, and backend frameworks.",
       category: "Technology",
-      pdf_url: `${baseURL}Introduction_to_GitHub.pdf`,
-    },
-    {
-      id: "vscode_intro",
-      title: "Introduction to VS Code",
-      description: "Get started with Visual Studio Code for development.",
-      category: "Technology",
-      pdf_url: `${baseURL}Introduction_to_VS_Code.pdf`,
-    },
-
-    // 🔒 Cybersecurity
-    {
-      id: "ethical_hacking",
-      title: "Ethical Hacking Fundamentals",
-      description: "Learn the basics of ethical hacking and penetration testing.",
-      category: "Cybersecurity",
-      pdf_url: `${baseURL}Ethical_Hacking_Fundamentals.pdf`,
+      pdf_url: "https://drive.google.com/uc?export=view&id=1gjMzud9Ox-GZb1yWXRMHUvGJ8bqhS-_O",
     },
     {
       id: "cybersecurity_fundamentals",
       title: "Cybersecurity Fundamentals",
       description: "Understand cybersecurity concepts and best practices.",
       category: "Cybersecurity",
-      pdf_url: `${baseURL}Cybersecurity_Fundamentals.pdf`,
+      pdf_url: "https://drive.google.com/uc?export=view&id=1uiNzmoxwxR0kvEgR-O4-WyWgO56AffpC",
+    },
+    {
+      id: "ethical_hacking",
+      title: "Ethical Hacking Fundamentals",
+      description: "Learn the basics of ethical hacking and penetration testing.",
+      category: "Cybersecurity",
+      pdf_url: "https://drive.google.com/uc?export=view&id=16W969BkOX7H2O3nJC8C8P6PAq8Ip4SEI",
+    },
+    {
+      id: "math_high",
+      title: "High School Mathematics (Grades 9–10)",
+      description: "Advanced topics in algebra, geometry, and trigonometry.",
+      category: "Mathematics",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1IizOE0ZvgxwujCLx-N5pN5tVx_gNo0p_",
+    },
+    {
+      id: "html",
+      title: "HTML Foundations",
+      description: "Learn how to structure and design web pages using HTML.",
+      category: "Technology",
+      pdf_url: "https://drive.google.com/uc?export=view&id=15Ak4TIG-yzoT3DBgrAGxfSRpTXeTekjj",
+    },
+    {
+      id: "github_intro",
+      title: "Introduction to GitHub",
+      description: "Version control and collaboration essentials using GitHub.",
+      category: "Technology",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1m706395V3GJS3D6xpppPsLeW-BfDmNkR",
+    },
+    {
+      id: "vscode_intro",
+      title: "Introduction to VS Code",
+      description: "Get started with Visual Studio Code for development.",
+      category: "Technology",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1ohEnTC7UO6L9zltVUzfQ39X-oUiwc7eF",
+    },
+    {
+      id: "math_middle",
+      title: "Middle School Mathematics (Grades 6–8)",
+      description: "Fundamental math concepts for middle schoolers.",
+      category: "Mathematics",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1mDtE7cHTV6RUQ4OkrK5rArR5d9ysTrsG",
+    },
+    {
+      id: "python",
+      title: "Python Foundations",
+      description: "A beginner-friendly guide to Python programming.",
+      category: "Technology",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1MOQKm4hLyiseRbcLhgHhvRGE295drQAN",
+    },
+    {
+      id: "math_senior",
+      title: "Senior Secondary Mathematics (Grades 11–12)",
+      description: "Comprehensive coverage for senior-level math.",
+      category: "Mathematics",
+      pdf_url: "https://drive.google.com/uc?export=view&id=1Y8fOzfii_T3baQ4560kNDB94NF3_HgbK",
     },
   ];
 
@@ -130,7 +123,9 @@ const Courses = () => {
       }
       fetchProgress();
     };
+
     checkAuthAndFetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchProgress = async () => {
@@ -147,9 +142,10 @@ const Courses = () => {
     if (existing) {
       const { error } = await supabase
         .from("user_course_progress")
-        .update({ completed: !existing.completed })
+        .update({ completed: !existing.completed, completed_at: !existing.completed ? new Date().toISOString() : null })
         .eq("user_id", session.user.id)
         .eq("course_id", courseId);
+
       if (error) toast.error("Failed to update progress");
       else {
         toast.success(existing.completed ? "Marked incomplete" : "Marked complete!");
