@@ -35,6 +35,23 @@ const Whiteboard = () => {
     ctxRef.current.stroke();
   };
 
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [showCursor, setShowCursor] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setCursorPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
+    draw(e);
+  };
+
+  const handleMouseEnter = () => {
+    setShowCursor(true);
+  };
+
+  const handleMouseLeaveCanvas = () => {
+    setShowCursor(false);
+    stopDrawing();
+  };
+
   const stopDrawing = () => {
     if (!ctxRef.current) return;
     ctxRef.current.closePath();
@@ -90,17 +107,39 @@ const Whiteboard = () => {
             <Trash2 className="mr-2 h-4 w-4" /> Clear
           </Button>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center relative">
           <canvas
             ref={canvasRef}
             width={800}
             height={500}
-            className="border rounded-lg bg-white shadow-lg cursor-crosshair"
+            className="border rounded-lg bg-white shadow-lg cursor-none"
             onMouseDown={startDrawing}
-            onMouseMove={draw}
+            onMouseMove={handleMouseMove}
             onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeaveCanvas}
           />
+          {showCursor && (
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                left: cursorPos.x,
+                top: cursorPos.y,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <div
+                className={`rounded-full border-2 ${
+                  isEraser ? 'border-gray-400' : 'border-black'
+                }`}
+                style={{
+                  width: `${isEraser ? lineWidth * 3 : lineWidth}px`,
+                  height: `${isEraser ? lineWidth * 3 : lineWidth}px`,
+                  backgroundColor: isEraser ? 'rgba(255, 255, 255, 0.5)' : 'transparent',
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
