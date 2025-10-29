@@ -1,25 +1,8 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
 const Dashboard = () => {
-  const [noteCount, setNoteCount] = useState(0);
-
-  useEffect(() => {
-    const fetchNoteCount = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      const { count } = await supabase
-        .from("notes")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", session.user.id);
-      if (count !== null) setNoteCount(count);
-    };
-    fetchNoteCount();
-  }, []);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -28,48 +11,47 @@ const Dashboard = () => {
           Welcome Back!
         </h1>
         <p className="text-muted-foreground mb-8">
-          Here's your learning progress overview
+          Continue your learning journey with DexNotePro
         </p>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Total Notes */}
+          {/* Notes Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
-                Total Notes
+                Notes
               </CardTitle>
               <CardDescription>Your personal knowledge base</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold">{noteCount}</p>
+              <p className="text-lg text-muted-foreground">
+                Access, organize, and edit your saved notes anytime.
+              </p>
+              <a
+                href="/notes"
+                className="inline-block mt-4 text-primary hover:underline"
+              >
+                ✏️ Go to Notes
+              </a>
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
+          {/* Quick Links Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Quick Access</CardTitle>
               <CardDescription>Jump right into learning</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <a
-                href="/notes"
-                className="block text-primary hover:underline"
-              >
-                ✏️ Create a new note
+            <CardContent className="space-y-3">
+              <a href="/courses" className="block text-primary hover:underline">
+                📘 Browse Courses
               </a>
-              <a
-                href="/courses"
-                className="block text-primary hover:underline"
-              >
-                📘 Browse courses
+              <a href="/aitools" className="block text-primary hover:underline">
+                🤖 Explore AI Tools
               </a>
-              <a
-                href="/aitools"
-                className="block text-primary hover:underline"
-              >
-                🤖 Try AI tools
+              <a href="/notes" className="block text-primary hover:underline">
+                🗒️ Create New Note
               </a>
             </CardContent>
           </Card>
