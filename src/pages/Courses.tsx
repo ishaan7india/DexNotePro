@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,94 +15,73 @@ interface Course {
   pdf_url: string;
 }
 
+const localCourses: Course[] = [
+  {
+    id: "1",
+    title: "Python Foundations",
+    description: "Master Python fundamentals, syntax, and logic.",
+    category: "Programming",
+    thumbnail_url: "/images/python.jpg", // optional thumbnail in /public/images/
+    pdf_url: "/courses/python_foundations.pdf",
+  },
+  {
+    id: "2",
+    title: "Backend Development Foundations",
+    description: "Learn APIs, databases, and server-side logic.",
+    category: "Web Development",
+    thumbnail_url: "/images/backend.jpg",
+    pdf_url: "/courses/backend_development.pdf",
+  },
+  {
+    id: "3",
+    title: "Ethical Hacking",
+    description: "Understand cybersecurity and penetration testing basics.",
+    category: "Cybersecurity",
+    thumbnail_url: "/images/ethical_hacking.jpg",
+    pdf_url: "/courses/ethical_hacking.pdf",
+  },
+  // ➕ Add more courses here
+];
+
 interface UserProgress {
   course_id: string;
   completed: boolean;
 }
 
 const Courses = () => {
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<UserProgress[]>([]);
-  const [loading, setLoading] = useState(true);
 
+  // 🧠 Load saved progress from localStorage
   useEffect(() => {
-    const checkAuthAndFetch = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      fetchData();
-    };
+    const saved = localStorage.getItem("course_progress");
+    if (saved) setProgress(JSON.parse(saved));
+  }, []);
 
-    checkAuthAndFetch();
-  }, [navigate]);
-
-  const fetchData = async () => {
-    const [coursesResult, progressResult] = await Promise.all([
-      supabase.from("courses").select("*").order("created_at", { ascending: false }),
-      supabase.from("user_course_progress").select("*"),
-    ]);
-
-    if (coursesResult.data) setCourses(coursesResult.data);
-    if (progressResult.data) setProgress(progressResult.data);
-    setLoading(false);
+  // 💾 Save progress to localStorage
+  const saveProgress = (newProgress: UserProgress[]) => {
+    setProgress(newProgress);
+    localStorage.setItem("course_progress", JSON.stringify(newProgress));
   };
 
-  const toggleCompletion = async (courseId: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+  const toggleCompletion = (courseId: string) => {
+    const existing = progress.find((p) => p.course_id === courseId);
+    let newProgress;
 
-    const existingProgress = progress.find((p) => p.course_id === courseId);
-
-    if (existingProgress) {
-      const { error } = await supabase
-        .from("user_course_progress")
-        .update({
-          completed: !existingProgress.completed,
-          completed_at: !existingProgress.completed ? new Date().toISOString() : null,
-        })
-        .eq("user_id", session.user.id)
-        .eq("course_id", courseId);
-
-      if (error) {
-        toast.error("Failed to update progress");
-      } else {
-        toast.success(existingProgress.completed ? "Marked as incomplete" : "Marked as complete!");
-        fetchData();
-      }
+    if (existing) {
+      newProgress = progress.map((p) =>
+        p.course_id === courseId ? { ...p, completed: !p.completed } : p
+      );
+      toast.success(existing.completed ? "Marked as incomplete" : "Marked as complete!");
     } else {
-      const { error } = await supabase.from("user_course_progress").insert([
-        {
-          user_id: session.user.id,
-          course_id: courseId,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-      ]);
-
-      if (error) {
-        toast.error("Failed to update progress");
-      } else {
-        toast.success("Marked as complete!");
-        fetchData();
-      }
+      newProgress = [...progress, { course_id: courseId, completed: true }];
+      toast.success("Marked as complete!");
     }
+
+    saveProgress(newProgress);
   };
 
-  const isCompleted = (courseId: string) => {
-    return progress.find((p) => p.course_id === courseId)?.completed || false;
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">Loading...</div>
-      </div>
-    );
-  }
+  const isCompleted = (courseId: string) =>
+    progress.find((p) => p.course_id === courseId)?.completed || false;
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,11 +91,13 @@ const Courses = () => {
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Course Library
           </h1>
-          <p className="text-muted-foreground">Explore our collection of learning materials</p>
+          <p className="text-muted-foreground">
+            Explore our curated collection of PDF-based courses
+          </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
+          {localCourses.map((course) => (
             <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div
                 className="h-48 bg-cover bg-center"
