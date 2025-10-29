@@ -19,6 +19,8 @@ interface Course {
 interface UserProgress {
   course_id: string;
   completed: boolean;
+  user_id?: string;
+  completed_at?: string | null;
 }
 
 const Courses = () => {
@@ -26,7 +28,7 @@ const Courses = () => {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ——— Your Google Drive links (converted to direct view links) ———
+  // ——— Your Google Drive links in the order you specified ———
   const courses: Course[] = [
     {
       id: "ai_fundamentals",
@@ -121,50 +123,71 @@ const Courses = () => {
         navigate("/auth");
         return;
       }
-      fetchProgress();
+      await fetchProgress(session.user.id);
     };
 
     checkAuthAndFetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
-  const fetchProgress = async () => {
-    const { data } = await supabase.from("user_course_progress").select("*");
-    if (data) setProgress(data);
-    setLoading(false);
+  // fetch progress for current user only
+  const fetchProgress = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_course_progress")
+        .select("course_id, completed, completed_at")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Fetch progress error:", error);
+      } else {
+        setProgress(data || []);
+      }
+    } catch (err) {
+      console.error("Unexpected fetchProgress error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // toggle completion via upsert (insert or update in one atomic call)
   const toggleCompletion = async (courseId: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("You must be signed in to mark progress.");
+        return;
+      }
+      const userId = session.user.id;
+      const existing = progress.find((p) => p.course_id === courseId);
+      const newCompleted = existing ? !existing.completed : true;
+      const completedAt = newCompleted ? new Date().toISOString() : null;
 
-    const existing = progress.find((p) => p.course_id === courseId);
-    if (existing) {
+      // upsert: will insert if not exists or update if exists; onConflict by user+course
       const { error } = await supabase
         .from("user_course_progress")
-        .update({ completed: !existing.completed, completed_at: !existing.completed ? new Date().toISOString() : null })
-        .eq("user_id", session.user.id)
-        .eq("course_id", courseId);
+        .upsert(
+          [
+            {
+              user_id: userId,
+              course_id: courseId,
+              completed: newCompleted,
+              completed_at: completedAt,
+            },
+          ],
+          { onConflict: ["user_id", "course_id"] }
+        );
 
-      if (error) toast.error("Failed to update progress");
-      else {
-        toast.success(existing.completed ? "Marked incomplete" : "Marked complete!");
-        fetchProgress();
+      if (error) {
+        console.error("Upsert error:", error);
+        toast.error("Failed to save progress");
+      } else {
+        toast.success(newCompleted ? "Marked complete!" : "Marked incomplete");
+        await fetchProgress(userId);
       }
-    } else {
-      const { error } = await supabase.from("user_course_progress").insert([
-        {
-          user_id: session.user.id,
-          course_id: courseId,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-      ]);
-      if (error) toast.error("Failed to save progress");
-      else {
-        toast.success("Marked complete!");
-        fetchProgress();
-      }
+    } catch (err) {
+      console.error("toggleCompletion unexpected error:", err);
+      toast.error("Failed to save progress");
     }
   };
 
