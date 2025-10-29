@@ -26,10 +26,9 @@ const Courses = () => {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ base path fix for GitHub Pages
-  const base = import.meta.env.BASE_URL || "/";
+  // ✅ Base URL for GitHub Pages
+  const baseURL = "https://ishaan7india.github.io/DexNotePro/courses/";
 
-  // 🧾 Static course list
   const courses: Course[] = [
     // 🧮 Mathematics Series
     {
@@ -37,72 +36,72 @@ const Courses = () => {
       title: "Middle School Mathematics (Grades 6–8)",
       description: "Fundamental math concepts for middle schoolers.",
       category: "Mathematics",
-      pdf_url: `${base}public/courses/Middle_School_Mathematics.pdf`,
+      pdf_url: `${baseURL}Middle_School_Mathematics.pdf`,
     },
     {
       id: "math_high",
       title: "High School Mathematics (Grades 9–10)",
       description: "Advanced topics in algebra, geometry, and trigonometry.",
       category: "Mathematics",
-      pdf_url: `${base}public/courses/High_School_Mathematics.pdf`,
+      pdf_url: `${baseURL}High_School_Mathematics.pdf`,
     },
     {
       id: "math_senior",
       title: "Senior Secondary Mathematics (Grades 11–12)",
       description: "Comprehensive coverage for senior-level math.",
       category: "Mathematics",
-      pdf_url: `${base}public/courses/Senior_Secondary_Mathematics.pdf`,
+      pdf_url: `${baseURL}Senior_Secondary_Mathematics.pdf`,
     },
 
-    // 💻 Technology & Computing
+    // 💻 Technology
     {
       id: "python",
       title: "Python Foundations",
       description: "A beginner-friendly guide to Python programming.",
       category: "Technology",
-      pdf_url: `${base}public/courses/Python_Foundations.pdf`,
+      pdf_url: `${baseURL}Python_Foundations.pdf`,
     },
     {
       id: "html",
       title: "HTML Foundations",
       description: "Learn how to structure and design web pages using HTML.",
       category: "Technology",
-      pdf_url: `${base}public/courses/HTML_Foundations.pdf`,
+      pdf_url: `${baseURL}HTML_Foundations.pdf`,
     },
     {
       id: "backend",
       title: "Backend Development Foundations",
       description: "Introduction to servers, databases, and backend frameworks.",
       category: "Technology",
-      pdf_url: `${base}public/courses/Backend_Development_Foundations.pdf`,
+      pdf_url: `${baseURL}Backend_Development_Foundations.pdf`,
     },
     {
       id: "ai_fundamentals",
       title: "AI Fundamentals",
       description: "Understand the core ideas behind Artificial Intelligence.",
       category: "Technology",
-      pdf_url: `${base}public/courses/AI_Fundamentals.pdf`,
+      pdf_url: `${baseURL}AI_Fundamentals.pdf`,
     },
     {
       id: "ai_accelerator",
       title: "AI Generalist Accelerator",
       description: "Boost your AI knowledge and skills rapidly.",
       category: "Technology",
-      pdf_url: `${base}public/courses/AI_Generalist_Accelerator.pdf`,
+      pdf_url: `${baseURL}AI_Generalist_Accelerator.pdf`,
     },
     {
       id: "github_intro",
       title: "Introduction to GitHub",
       description: "Version control and collaboration essentials using GitHub.",
       category: "Technology",
-      pdf_url: `${base}public/courses/Introduction_to_GitHub.pdf`,
+      pdf_url: `${baseURL}Introduction_to_GitHub.pdf`,
     },
     {
       id: "vscode_intro",
       title: "Introduction to VS Code",
       description: "Get started with Visual Studio Code for development.",
       category: "Technology",
-      pdf_url: `${base}public/courses/Introduction_to_VS_Code.pdf`,
+      pdf_url: `${baseURL}Introduction_to_VS_Code.pdf`,
     },
 
     // 🔒 Cybersecurity
@@ -111,14 +110,14 @@ const Courses = () => {
       title: "Ethical Hacking Fundamentals",
       description: "Learn the basics of ethical hacking and penetration testing.",
       category: "Cybersecurity",
-      pdf_url: `${base}public/courses/Ethical_Hacking_Fundamentals.pdf`,
+      pdf_url: `${baseURL}Ethical_Hacking_Fundamentals.pdf`,
     },
     {
       id: "cybersecurity_fundamentals",
       title: "Cybersecurity Fundamentals",
       description: "Understand cybersecurity concepts and best practices.",
       category: "Cybersecurity",
-      pdf_url: `${base}public/courses/Cybersecurity_Fundamentals.pdf`,
+      pdf_url: `${baseURL}Cybersecurity_Fundamentals.pdf`,
     },
   ];
 
@@ -131,7 +130,6 @@ const Courses = () => {
       }
       fetchProgress();
     };
-
     checkAuthAndFetch();
   }, [navigate]);
 
@@ -154,9 +152,7 @@ const Courses = () => {
         .eq("course_id", courseId);
       if (error) toast.error("Failed to update progress");
       else {
-        toast.success(
-          existing.completed ? "Marked incomplete" : "Marked complete!"
-        );
+        toast.success(existing.completed ? "Marked incomplete" : "Marked complete!");
         fetchProgress();
       }
     } else {
