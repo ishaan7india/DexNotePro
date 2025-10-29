@@ -24,14 +24,16 @@ const Whiteboard = () => {
 
   const startDrawing = (e: React.MouseEvent) => {
     if (!ctxRef.current) return;
+    const coords = getCanvasCoordinates(e);
     ctxRef.current.beginPath();
-    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    ctxRef.current.moveTo(coords.x, coords.y);
     setIsDrawing(true);
   };
 
   const draw = (e: React.MouseEvent) => {
     if (!isDrawing || !ctxRef.current) return;
-    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    const coords = getCanvasCoordinates(e);
+    ctxRef.current.lineTo(coords.x, coords.y);
     ctxRef.current.stroke();
   };
 
