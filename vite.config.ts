@@ -3,9 +3,9 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
+// ✅ Vite config for GitHub Pages (repo name: DexNotePro)
 export default defineConfig(({ mode }) => ({
-  base: '/DexNotePro/',
+  base: '/DexNotePro/', // 👈 Important: matches your GitHub repo name
   server: {
     host: "::",
     port: 8080,
