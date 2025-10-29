@@ -7,6 +7,15 @@
 
     <!-- ✅ Corrected path for GitHub Pages subdirectory -->
     <link rel="icon" type="image/png" href="./short-logo.png" />
+    <script>
+      // Force favicon to reload only once
+      window.addEventListener('DOMContentLoaded', () => {
+        const link = document.querySelector("link[rel~='icon']");
+        if (link) {
+          link.href = link.href; // refresh icon
+        }
+      });
+    </script>
 
     <meta
       name="description"
