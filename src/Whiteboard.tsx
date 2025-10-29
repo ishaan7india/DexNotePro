@@ -38,8 +38,19 @@ const Whiteboard = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
 
+  const getCanvasCoordinates = (e: React.MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
-    setCursorPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
+    const coords = getCanvasCoordinates(e);
+    setCursorPos(coords);
     draw(e);
   };
 
