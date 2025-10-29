@@ -4,9 +4,6 @@ import Navbar from "@/components/Navbar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-// Change this to match your GitHub Pages subdirectory
-const BASE_PATH = "/DexNotePro";
-
 const Dashboard = () => {
   const [noteCount, setNoteCount] = useState(0);
   const [userName, setUserName] = useState("");
@@ -15,11 +12,9 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // You can fetch user metadata or email here
         const name = session.user.user_metadata?.name || session.user.email?.split("@")[0];
         setUserName(name || "Learner");
 
-        // Optional: count notes (kept in case you want later)
         const { count } = await supabase
           .from("notes")
           .select("*", { count: "exact", head: true })
@@ -53,25 +48,6 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-semibold">{noteCount}</p>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Jump right into learning</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <a href={`${BASE_PATH}/notes`} className="block text-primary hover:underline">
-                ✏️ Create a new note
-              </a>
-              <a href={`${BASE_PATH}/courses`} className="block text-primary hover:underline">
-                📘 Browse courses
-              </a>
-              <a href={`${BASE_PATH}/aitools`} className="block text-primary hover:underline">
-                🤖 Try AI tools
-              </a>
             </CardContent>
           </Card>
         </div>
